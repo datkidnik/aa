@@ -98,4 +98,17 @@ public class KDTreeNN implements NearestNeigh{
         }
         return unSortedList;
     }
+    
+    public int findMedium(List<Point> findMediumForList){
+        int numberOfPoints = findMediumForList.size();
+        int s;
+        if((numberOfPoints % 2) == 0){
+            s = (numberOfPoints/2)+1;
+            return s;
+        }
+        else{
+            s = ((numberOfPoints-1)/2)+1;
+            return s;
+        }
+    }
 }
