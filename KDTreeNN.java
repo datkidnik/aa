@@ -37,13 +37,13 @@ public class KDTreeNN implements NearestNeigh{
             }
         }
         
-        restaurantStructure = sortTree(restaurantStructure, true);    
+            
         restaurantRoot = buildTree(restaurantStructure, true, null);
         
-        educationStructure = sortTree(educationStructure, true);    
+          
         educationRoot = buildTree(educationStructure, true, null);
         
-        hospitalStructure = sortTree(hospitalStructure, true);    
+         
         hospitalRoot = buildTree(hospitalStructure, true, null);
      
     }
