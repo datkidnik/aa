@@ -1,5 +1,6 @@
 package nearestNeigh;
 
+import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +11,11 @@ import java.util.List;
  */
 public class KDTreeNN implements NearestNeigh{
 
+
     @Override
     public void buildIndex(List<Point> points) {
         // To be implemented.
+     
     }
 
     @Override
@@ -46,29 +49,29 @@ public class KDTreeNN implements NearestNeigh{
         private Node rightChild;
         private Point point;
 
-        public Node setParent(Node parent){
+        public void setParent(Node parent){
             this.parent = parent;
         }
 
-        public Node setLeftChild(Node leftChild){
+        public void setLeftChild(Node leftChild){
             this.leftChild = leftChild;
         }
 
-        public Node setRightChild(Node rightChild){
+        public void setRightChild(Node rightChild){
             this.rightChild = rightChild;
         }
 
-        public Point setCurrPoint(Point obj){
+        public void setCurrPoint(Point obj){
             this.point = obj;
         }
 
-        public void getPoint(){
+        public Point getPoint(){
             return point;
         }
                
     }
     
-    public List<Point> sortTree(List<Point> unSortedList, int whichAxis){
+    public List<Point> sortTree(List<Point> unSortedList, boolean bXDim){
         Point temp;
         int i, j, min;
         int sizeOfList = unSortedList.size();
@@ -77,12 +80,12 @@ public class KDTreeNN implements NearestNeigh{
             min = i;   //initialize to subscript of first element
 
             for(j=i+1; j<sizeOfList-1; j++){   //locate smallest element between positions 1 and i.        
-                if(whichAxis == 0){
+                if(bXDim == true){
                     if(unSortedList.get(j).lat < unSortedList.get(min).lat){
                         min = j;
                     } 
                 }
-                else if(whichAxis == 1){
+                else if(bXDim == false){
                     if(unSortedList.get(j).lon < unSortedList.get(min).lon){
                         min = j;
                     } 
@@ -114,44 +117,60 @@ public class KDTreeNN implements NearestNeigh{
     
     public Node buildNode(Point median){
         Node newNode;
+        newNode = null;
         newNode.setCurrPoint(median);
         return newNode;
     }
-    
+
     public boolean flip(boolean ans){
-        switch(ans){
-            case true:
-                return false;
-            case false:
-                return true;
+        if(ans == true){
+            return false;
+        }
+        else if(ans == false){
+            return true;
         } 
+        else{
+            return false;
+        }
     }
 
-    public Node buildTree(List<Points> points, boolean bXDim) { 
+    public Node buildTree(List<Point> points, boolean bXDim, Node parent){ 
         List<Point> sortedPoints = new ArrayList<Point>();
-        int median;
-        Node currParent, leftChild, rightChild;
-        sortedPoints = sortTree(points, bXDim); 
+        List<Point> tempTree = new ArrayList<Point>();
+        List<Point> leftTree = new ArrayList<Point>();
+        List<Point> rightTree = new ArrayList<Point>();
+        int median, sizeOfTree;
+        Node currParent, leftChild, rightChild, currRoot;
+        sortedPoints = sortTree(points, bXDim);
+        sizeOfTree = sortedPoints.size();
         // find the median from sorted points 
         median = findMedium(sortedPoints); 
         // construct a node for the median point 
-        currParent = buildNode(sortedPoints[median]); 
+        currParent = buildNode(sortedPoints.get(median));
+        if(parent != null){
+            currParent.setParent(parent); 
+        } 
         leftChild = null; 
         rightChild = null; 
         // Check if there is a left partition (indexing starts at 0).  If so, recursively partition it
         if(median > 0){
             // flip() inverts the boolean value (effectively changing the dimension we split on next) 
-            leftChild = buildTree(sortedPoints[0..median-1], flip(bXDim)); 
+            leftTree = sortedPoints;
+            leftTree = leftTree.subList(median, sizeOfTree);
+            leftChild = buildTree(leftTree, flip(bXDim), currParent); 
         } 
             
         // check if there is a right partition 
-        if(median < length(points)){
+        if(median < sizeOfTree){
             // flip() inverts the boolean value (effectively changing the dimension we split on next) 
-            rightChild = buildTree(sortedPoints[median+1...length(points)-1], flip(bXDim)); 
+            rightTree = sortedPoints;
+            rightTree = rightTree.subList(0, median);
+            rightChild = buildTree(rightTree, flip(bXDim), currParent); 
         }       
         currParent.setLeftChild(leftChild); 
         currParent.setLeftChild(rightChild); 
  
-        return currRoot; 
+        return currParent; 
     }
+
 }
