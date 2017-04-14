@@ -67,4 +67,30 @@ public class KDTreeNN implements NearestNeigh{
         }
                
     }
+    
+    public List<Point> sortTree(List<Point> unSortedList, int whichAxis){
+        Point temp;
+        int i, j, min;
+        int sizeOfList = unSortedList.size();
+
+        for (i=0; i<sizeOfList-1; i++){  
+            min = i;   //initialize to subscript of first element
+
+            for(j=i+1; j<sizeOfList-1; j++){   //locate smallest element between positions 1 and i.        
+                
+                if(unSortedList.get(j).lat < unSortedList.get(min).lat){
+                    min = j;
+                }   
+                              
+            }
+            if(min != i){
+                temp = unSortedList.get(min);   //swap smallest found with element in position i.
+                unSortedList.add(min, unSortedList.get(i));
+                unSortedList.remove((min+1));
+                unSortedList.add(i, temp); 
+                unSortedList.remove((i+1));
+            }       
+        }
+        return unSortedList;
+    }
 }
