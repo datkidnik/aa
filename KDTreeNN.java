@@ -117,4 +117,41 @@ public class KDTreeNN implements NearestNeigh{
         newNode.setCurrPoint(median);
         return newNode;
     }
+    
+    public boolean flip(boolean ans){
+        switch(ans){
+            case true:
+                return false;
+            case false:
+                return true;
+        } 
+    }
+
+    public Node buildTree(List<Points> points, boolean bXDim) { 
+        List<Point> sortedPoints = new ArrayList<Point>();
+        int median;
+        Node currParent, leftChild, rightChild;
+        sortedPoints = sortTree(points, bXDim); 
+        // find the median from sorted points 
+        median = findMedium(sortedPoints); 
+        // construct a node for the median point 
+        currParent = buildNode(sortedPoints[median]); 
+        leftChild = null; 
+        rightChild = null; 
+        // Check if there is a left partition (indexing starts at 0).  If so, recursively partition it
+        if(median > 0){
+            // flip() inverts the boolean value (effectively changing the dimension we split on next) 
+            leftChild = buildTree(sortedPoints[0..median-1], flip(bXDim)); 
+        } 
+            
+        // check if there is a right partition 
+        if(median < length(points)){
+            // flip() inverts the boolean value (effectively changing the dimension we split on next) 
+            rightChild = buildTree(sortedPoints[median+1...length(points)-1], flip(bXDim)); 
+        }       
+        currParent.setLeftChild(leftChild); 
+        currParent.setLeftChild(rightChild); 
+ 
+        return currRoot; 
+    }
 }
