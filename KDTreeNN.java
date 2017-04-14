@@ -72,34 +72,7 @@ public class KDTreeNN implements NearestNeigh{
         return false;
     }
 
-    public class Node
-    {
-        private Node parent;
-        private Node leftChild;
-        private Node rightChild;
-        private Point point;
-
-        public void setParent(Node parent){
-            this.parent = parent;
-        }
-
-        public void setLeftChild(Node leftChild){
-            this.leftChild = leftChild;
-        }
-
-        public void setRightChild(Node rightChild){
-            this.rightChild = rightChild;
-        }
-
-        public void setCurrPoint(Point obj){
-            this.point = obj;
-        }
-
-        public Point getPoint(){
-            return point;
-        }
-               
-    }
+    
     
     public List<Point> sortTree(List<Point> unSortedList, boolean bXDim){
         Point temp;
@@ -145,14 +118,12 @@ public class KDTreeNN implements NearestNeigh{
         }
     }
     
-    public Node buildNode(Point median){
-        Node newNode;
+    /*public buildNode(Point median){
         newNode.setParent(null);
         newNode.setLeftChild(null);
         newNode.setRightChild(null);
         newNode.setCurrPoint(median);
-        return newNode;
-    }
+    }*/
 
     public boolean flip(boolean ans){
         if(ans == true){
@@ -178,7 +149,7 @@ public class KDTreeNN implements NearestNeigh{
         // find the median from sorted points 
         median = findMedium(sortedPoints); 
         // construct a node for the median point 
-        currParent = buildNode(sortedPoints.get(median));
+        currParent = new Node(sortedPoints.get(median));
         if(parent != null){
             currParent.setParent(parent); 
         } 
@@ -203,6 +174,42 @@ public class KDTreeNN implements NearestNeigh{
         currParent.setLeftChild(rightChild); 
  
         return currParent; 
+    }
+
+public class Node
+    {
+        private Node parent;
+        private Node leftChild;
+        private Node rightChild;
+        private Point point;
+
+        public Node(Point x){
+            this.point = x;
+            this.parent = null;
+            this.leftChild = null;
+            this.rightChild = null;
+        }
+
+        public void setParent(Node parent){
+            this.parent = parent;
+        }
+
+        public void setLeftChild(Node leftChild){
+            this.leftChild = leftChild;
+        }
+
+        public void setRightChild(Node rightChild){
+            this.rightChild = rightChild;
+        }
+
+        public void setCurrPoint(Point obj){
+            this.point = obj;
+        }
+
+        public Point getPoint(){
+            return point;
+        }
+               
     }
 
 }
