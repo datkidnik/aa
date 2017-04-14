@@ -111,4 +111,10 @@ public class KDTreeNN implements NearestNeigh{
             return s;
         }
     }
+    
+    public Node buildNode(Point median){
+        Node newNode;
+        newNode.setCurrPoint(median);
+        return newNode;
+    }
 }
