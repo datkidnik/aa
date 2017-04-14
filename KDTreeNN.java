@@ -44,8 +44,7 @@ public class KDTreeNN implements NearestNeigh{
         private Node parent;
         private Node leftChild;
         private Node rightChild;
-        private int xCoord;
-        private int yCoord;
+        private Point point;
 
         public Node setParent(Node parent){
             this.parent = parent;
@@ -59,23 +58,13 @@ public class KDTreeNN implements NearestNeigh{
             this.rightChild = rightChild;
         }
 
-        public int setXCoord(int x){
-            this.xCoord = x;
+        public Point setCurrPoint(Point obj){
+            this.point = obj;
         }
 
-        public void getXCoord(){
-            return xCoord;
+        public void getPoint(){
+            return point;
         }
-
-        public int setYCoord(int y){
-            this.yCoord = y;
-        }
-
-        public void getYCoord(){
-            return yCoord;
-        }
-        
-        
                
     }
 }
