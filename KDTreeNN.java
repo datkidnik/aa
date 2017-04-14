@@ -147,7 +147,9 @@ public class KDTreeNN implements NearestNeigh{
     
     public Node buildNode(Point median){
         Node newNode;
-        newNode = null;
+        newNode.setParent(null);
+        newNode.setLeftChild(null);
+        newNode.setRightChild(null);
         newNode.setCurrPoint(median);
         return newNode;
     }
