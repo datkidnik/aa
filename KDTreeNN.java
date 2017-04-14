@@ -77,11 +77,16 @@ public class KDTreeNN implements NearestNeigh{
             min = i;   //initialize to subscript of first element
 
             for(j=i+1; j<sizeOfList-1; j++){   //locate smallest element between positions 1 and i.        
-                
-                if(unSortedList.get(j).lat < unSortedList.get(min).lat){
-                    min = j;
-                }   
-                              
+                if(whichAxis == 0){
+                    if(unSortedList.get(j).lat < unSortedList.get(min).lat){
+                        min = j;
+                    } 
+                }
+                else if(whichAxis == 1){
+                    if(unSortedList.get(j).lon < unSortedList.get(min).lon){
+                        min = j;
+                    } 
+                }                                               
             }
             if(min != i){
                 temp = unSortedList.get(min);   //swap smallest found with element in position i.
