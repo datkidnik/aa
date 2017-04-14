@@ -14,12 +14,13 @@ public class KDTreeNN implements NearestNeigh{
     List<Point> restaurantStructure = new ArrayList<Point>();
     List<Point> hospitalStructure = new ArrayList<Point>();
     List<Point> educationStructure = new ArrayList<Point>();
-    
+    Node parent, hospitalRoot, restaurantRoot, educationRoot;
+
     @Override
     public void buildIndex(List<Point> points) {
         List<Point> sortedPoints = new ArrayList<Point>();
         int length, i, median;
-        Node parent, hospitalRoot, restaurantRoot, educationRoot;
+        
         length = points.size();
         for(i=0; i<length; i++){
             switch(points.get(i).cat){
@@ -40,7 +41,7 @@ public class KDTreeNN implements NearestNeigh{
           
         restaurantRoot = buildTree(restaurantStructure, true, null);
         System.out.println("work");
-        System.out.println(restaurantRoot.getPoint());
+        System.out.println(restaurantRoot.getLeftChild().getPoint());
           
         educationRoot = buildTree(educationStructure, true, null);
         
@@ -52,8 +53,80 @@ public class KDTreeNN implements NearestNeigh{
     @Override
     public List<Point> search(Point searchTerm, int k) {
         // To be implemented.
-        return new ArrayList<Point>();
+        int jon = 1;
+        List<Point> returnArrayList = new ArrayList<Point>();
+        Node tempNode, headNode;
+        if(/*searchTerm.cat == RESTAURANT*/ jon == 1){
+            double x, y;
+            boolean start, looper;
+            
+            start = true;
+            looper = false;
+
+            x = searchTerm.lat;
+            y = searchTerm.lon;
+            headNode = restaurantRoot;
+            tempNode = restaurantRoot;
+            while(looper == false){
+                //x axis shit
+                if(start == true){
+                    if(x > tempNode.getPoint().lat){
+                        if(tempNode.getRightChild() == null){
+                            looper = true;
+                        }
+                        else{
+                            tempNode = tempNode.getRightChild();
+                            start = false;
+                        }
+                    }
+                    else if(x < tempNode.getPoint().lat){
+                        if(tempNode.getLeftChild() == null){
+                            looper = true;
+                        }
+                        else{
+                            tempNode = tempNode.getLeftChild();
+                            start = false;
+                        }
+                    }
+                    else{
+                        looper = true;
+                    }
+                }
+                //y axis shit
+                else{
+                    if(y > tempNode.getPoint().lon){
+                        if(tempNode.getRightChild() == null){
+                            looper = true;
+                        }
+                        else{
+                            tempNode = tempNode.getRightChild();
+                            start = true;
+                        }
+                    }
+                    else if(y < tempNode.getPoint().lon){
+                        if(tempNode.getLeftChild() == null){
+                            looper = true;
+                        }
+                        else{
+                            tempNode = tempNode.getLeftChild();
+                            start = true;
+                        }
+                    }
+                    else{
+                        looper = true;
+                    }
+                } 
+            }
+        }
+        else{
+            tempNode = restaurantRoot;
+        }
+        Point suss = tempNode.getPoint();
+        returnArrayList.add(suss);
+        System.out.println(returnArrayList.get(0));
+        return returnArrayList;
     }
+
 
     @Override
     public boolean addPoint(Point point) {
@@ -230,6 +303,18 @@ public class Node
 
         public Point getPoint(){
             return point;
+        }
+
+        public Node getLeftChild(){
+            return leftChild;
+        }
+
+        public Node getRightChild(){
+            return rightChild;
+        }
+
+        public Node getParent(){
+            return parent;
         }
                
     }
