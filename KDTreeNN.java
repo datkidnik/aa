@@ -109,11 +109,11 @@ public class KDTreeNN implements NearestNeigh{
         int numberOfPoints = findMediumForList.size();
         int s;
         if((numberOfPoints % 2) == 0){
-            s = (numberOfPoints/2)+1;
+            s = (numberOfPoints/2);
             return s;
         }
         else{
-            s = ((numberOfPoints-1)/2)+1;
+            s = ((numberOfPoints-1)/2);
             return s;
         }
     }
@@ -146,8 +146,17 @@ public class KDTreeNN implements NearestNeigh{
         Node currParent, leftChild, rightChild, currRoot;
         sortedPoints = sortTree(points, bXDim);
         sizeOfTree = sortedPoints.size();
+
+        /*if (sortedPoints.size() == 2) {
+            median = findMedium(sortedPoints);
+            currParent.setRightChild(new Node(sortedPoints.get(median)));
+            currParent.setLeftChild(new Node(sortedPoints.get(median-1)));
+            return currParent; 
+        }*/
+        
         // find the median from sorted points 
         median = findMedium(sortedPoints); 
+
         // construct a node for the median point 
         currParent = new Node(sortedPoints.get(median));
         if(parent != null){
@@ -155,6 +164,9 @@ public class KDTreeNN implements NearestNeigh{
         } 
         leftChild = null; 
         rightChild = null; 
+
+        
+
         // Check if there is a left partition (indexing starts at 0).  If so, recursively partition it
         if(median > 0){
             // flip() inverts the boolean value (effectively changing the dimension we split on next) 
@@ -167,7 +179,7 @@ public class KDTreeNN implements NearestNeigh{
         if(median < sizeOfTree){
             // flip() inverts the boolean value (effectively changing the dimension we split on next) 
             rightTree = sortedPoints;
-            rightTree = rightTree.subList(median, sizeOfTree);
+            rightTree = rightTree.subList(0, median);
             rightChild = buildTree(rightTree, flip(bXDim), currParent); 
         }       
         currParent.setLeftChild(leftChild); 
