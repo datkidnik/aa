@@ -11,16 +11,40 @@ import java.util.List;
  */
 public class KDTreeNN implements NearestNeigh{
 
-
+    List<Point> restaurantStructure = new ArrayList<Point>();
+    List<Point> hospitalStructure = new ArrayList<Point>();
+    List<Point> educationStructure = new ArrayList<Point>();
+    
     @Override
     public void buildIndex(List<Point> points) {
         List<Point> sortedPoints = new ArrayList<Point>();
-        int median;
-        Node parent, root;
-        sortedPoints = sortTree(points, true);
-        median = findMedium(sortedPoints);
-        parent = buildNode(sortedPoints.get(median));
-        root = buildTree(point, true, parent);
+        int length, i, median;
+        Node parent, hospitalRoot, restaurantRoot, educationRoot;
+        length = points.size();
+        for(i=0; i<length; i++){
+            switch(points.get(i).cat){
+                case RESTAURANT:
+                    restaurantStructure.add(points.get(i));
+                    break;
+                case EDUCATION:
+                    educationStructure.add(points.get(i));
+                    break;
+                case HOSPITAL:
+                    hospitalStructure.add(points.get(i));
+                    break;
+                default:
+                    break;
+            }
+        }
+        
+        restaurantStructure = sortTree(restaurantStructure, true);    
+        restaurantRoot = buildTree(restaurantStructure, true, null);
+        
+        educationStructure = sortTree(educationStructure, true);    
+        educationRoot = buildTree(educationStructure, true, null);
+        
+        hospitalStructure = sortTree(hospitalStructure, true);    
+        hospitalRoot = buildTree(hospitalStructure, true, null);
      
     }
 
