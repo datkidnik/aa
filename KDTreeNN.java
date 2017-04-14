@@ -179,7 +179,7 @@ public class KDTreeNN implements NearestNeigh{
         if(median < sizeOfTree){
             // flip() inverts the boolean value (effectively changing the dimension we split on next) 
             rightTree = sortedPoints;
-            rightTree = rightTree.subList(0, median);
+            rightTree = rightTree.subList(median, sizeOfTree);
             rightChild = buildTree(rightTree, flip(bXDim), currParent); 
         }       
         currParent.setLeftChild(leftChild); 
