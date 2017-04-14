@@ -10,34 +10,9 @@ import java.util.List;
  */
 public class KDTreeNN implements NearestNeigh{
 
-    List<Point> restaurantStructure = new ArrayList<Point>();
-    List<Point> hospitalStructure = new ArrayList<Point>();
-    List<Point> educationStructure = new ArrayList<Point>();
-
     @Override
     public void buildIndex(List<Point> points) {
         // To be implemented.
-        int length, i;
-        length = points.size();
-        for(i=0; i<length; i++){
-            switch(points.get(i).cat){
-                case RESTAURANT:
-                    restaurantStructure.add(points.get(i));
-                    break;
-                case EDUCATION:
-                    educationStructure.add(points.get(i));
-                    break;
-                case HOSPITAL:
-                    hospitalStructure.add(points.get(i));
-                    break;
-                default:
-                    break;
-            }
-
-        }
-
-
-
     }
 
     @Override
@@ -64,4 +39,43 @@ public class KDTreeNN implements NearestNeigh{
         return false;
     }
 
+    public class Node
+    {
+        private Node parent;
+        private Node leftChild;
+        private Node rightChild;
+        private int xCoord;
+        private int yCoord;
+
+        public Node setParent(Node parent){
+            this.parent = parent;
+        }
+
+        public Node setLeftChild(Node leftChild){
+            this.leftChild = leftChild;
+        }
+
+        public Node setRightChild(Node rightChild){
+            this.rightChild = rightChild;
+        }
+
+        public int setXCoord(int x){
+            this.xCoord = x;
+        }
+
+        public void getXCoord(){
+            return xCoord;
+        }
+
+        public int setYCoord(int y){
+            this.yCoord = y;
+        }
+
+        public void getYCoord(){
+            return yCoord;
+        }
+        
+        
+               
+    }
 }
