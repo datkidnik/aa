@@ -37,9 +37,10 @@ public class KDTreeNN implements NearestNeigh{
             }
         }
         
-            
+          
         restaurantRoot = buildTree(restaurantStructure, true, null);
-        
+        System.out.println("work");
+        System.out.println(restaurantRoot.getPoint());
           
         educationRoot = buildTree(educationStructure, true, null);
         
@@ -147,45 +148,54 @@ public class KDTreeNN implements NearestNeigh{
         sortedPoints = sortTree(points, bXDim);
         sizeOfTree = sortedPoints.size();
 
-        /*if (sortedPoints.size() == 2) {
-            median = findMedium(sortedPoints);
-            currParent.setRightChild(new Node(sortedPoints.get(median)));
-            currParent.setLeftChild(new Node(sortedPoints.get(median-1)));
-            return currParent; 
-        }*/
-        
-        // find the median from sorted points 
-        median = findMedium(sortedPoints); 
+        if((points.size()) == 0){
+            return parent;
+        }
+        else{
+            // find the median from sorted points 
+            median = findMedium(sortedPoints); 
 
-        // construct a node for the median point 
-        currParent = new Node(sortedPoints.get(median));
-        if(parent != null){
-            currParent.setParent(parent); 
-        } 
-        leftChild = null; 
-        rightChild = null; 
+            // construct a node for the median point 
+            currParent = new Node(sortedPoints.get(median));
+            if (sortedPoints.size() == 2) {        
+                leftChild = new Node(sortedPoints.get(0));
+                rightChild = new Node(sortedPoints.get(1));
+                currParent.setRightChild(rightChild);
+                currParent.setLeftChild(leftChild);
+                return currParent; 
+            }
+            else{
+                if(parent != null){
+                    currParent.setParent(parent); 
+                } 
+                leftChild = null; 
+                rightChild = null; 
 
-        
+                
 
-        // Check if there is a left partition (indexing starts at 0).  If so, recursively partition it
-        if(median > 0){
-            // flip() inverts the boolean value (effectively changing the dimension we split on next) 
-            leftTree = sortedPoints;
-            leftTree = leftTree.subList(0, median);
-            leftChild = buildTree(leftTree, flip(bXDim), currParent); 
-        } 
+                // Check if there is a left partition (indexing starts at 0).  If so, recursively partition it
+                
+                // flip() inverts the boolean value (effectively changing the dimension we split on next) 
+                leftTree = sortedPoints;
+                leftTree = leftTree.subList(0, median);
+                leftChild = buildTree(leftTree, flip(bXDim), currParent); 
+                
+                    
+                // check if there is a right partition 
+               
+                // flip() inverts the boolean value (effectively changing the dimension we split on next) 
+                rightTree = sortedPoints;
+                rightTree = rightTree.subList(median+1, sizeOfTree);
+                rightChild = buildTree(rightTree, flip(bXDim), currParent); 
+                     
+                currParent.setLeftChild(leftChild); 
+                currParent.setRightChild(rightChild); 
+         
+                return currParent;
+            }
             
-        // check if there is a right partition 
-        if(median < sizeOfTree){
-            // flip() inverts the boolean value (effectively changing the dimension we split on next) 
-            rightTree = sortedPoints;
-            rightTree = rightTree.subList(median, sizeOfTree);
-            rightChild = buildTree(rightTree, flip(bXDim), currParent); 
-        }       
-        currParent.setLeftChild(leftChild); 
-        currParent.setLeftChild(rightChild); 
- 
-        return currParent; 
+        }
+         
     }
 
 public class Node
