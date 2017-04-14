@@ -1,5 +1,6 @@
 package nearestNeigh;
 
+import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,9 +11,17 @@ import java.util.List;
  */
 public class KDTreeNN implements NearestNeigh{
 
+
     @Override
     public void buildIndex(List<Point> points) {
-        // To be implemented.
+        List<Point> sortedPoints = new ArrayList<Point>();
+        int median;
+        Node parent, root;
+        sortedPoints = sortTree(points, true);
+        median = findMedium(sortedPoints);
+        parent = buildNode(sortedPoints.get(median));
+        root = buildTree(point, true, parent);
+     
     }
 
     @Override
@@ -44,38 +53,130 @@ public class KDTreeNN implements NearestNeigh{
         private Node parent;
         private Node leftChild;
         private Node rightChild;
-        private int xCoord;
-        private int yCoord;
+        private Point point;
 
-        public Node setParent(Node parent){
+        public void setParent(Node parent){
             this.parent = parent;
         }
 
-        public Node setLeftChild(Node leftChild){
+        public void setLeftChild(Node leftChild){
             this.leftChild = leftChild;
         }
 
-        public Node setRightChild(Node rightChild){
+        public void setRightChild(Node rightChild){
             this.rightChild = rightChild;
         }
 
-        public int setXCoord(int x){
-            this.xCoord = x;
+        public void setCurrPoint(Point obj){
+            this.point = obj;
         }
 
-        public void getXCoord(){
-            return xCoord;
+        public Point getPoint(){
+            return point;
         }
-
-        public int setYCoord(int y){
-            this.yCoord = y;
-        }
-
-        public void getYCoord(){
-            return yCoord;
-        }
-        
-        
                
     }
+    
+    public List<Point> sortTree(List<Point> unSortedList, boolean bXDim){
+        Point temp;
+        int i, j, min;
+        int sizeOfList = unSortedList.size();
+
+        for (i=0; i<sizeOfList-1; i++){  
+            min = i;   //initialize to subscript of first element
+
+            for(j=i+1; j<sizeOfList-1; j++){   //locate smallest element between positions 1 and i.        
+                if(bXDim == true){
+                    if(unSortedList.get(j).lat < unSortedList.get(min).lat){
+                        min = j;
+                    } 
+                }
+                else if(bXDim == false){
+                    if(unSortedList.get(j).lon < unSortedList.get(min).lon){
+                        min = j;
+                    } 
+                }                                               
+            }
+            if(min != i){
+                temp = unSortedList.get(min);   //swap smallest found with element in position i.
+                unSortedList.add(min, unSortedList.get(i));
+                unSortedList.remove((min+1));
+                unSortedList.add(i, temp); 
+                unSortedList.remove((i+1));
+            }       
+        }
+        return unSortedList;
+    }
+    
+    public int findMedium(List<Point> findMediumForList){
+        int numberOfPoints = findMediumForList.size();
+        int s;
+        if((numberOfPoints % 2) == 0){
+            s = (numberOfPoints/2)+1;
+            return s;
+        }
+        else{
+            s = ((numberOfPoints-1)/2)+1;
+            return s;
+        }
+    }
+    
+    public Node buildNode(Point median){
+        Node newNode;
+        newNode = null;
+        newNode.setCurrPoint(median);
+        return newNode;
+    }
+
+    public boolean flip(boolean ans){
+        if(ans == true){
+            return false;
+        }
+        else if(ans == false){
+            return true;
+        } 
+        else{
+            return false;
+        }
+    }
+
+    public Node buildTree(List<Point> points, boolean bXDim, Node parent){ 
+        List<Point> sortedPoints = new ArrayList<Point>();
+        List<Point> tempTree = new ArrayList<Point>();
+        List<Point> leftTree = new ArrayList<Point>();
+        List<Point> rightTree = new ArrayList<Point>();
+        int median, sizeOfTree;
+        Node currParent, leftChild, rightChild, currRoot;
+        sortedPoints = sortTree(points, bXDim);
+        sizeOfTree = sortedPoints.size();
+        // find the median from sorted points 
+        median = findMedium(sortedPoints); 
+        // construct a node for the median point 
+        currParent = buildNode(sortedPoints.get(median));
+        if(parent != null){
+            currParent.setParent(parent); 
+        } 
+        leftChild = null; 
+        rightChild = null; 
+        // Check if there is a left partition (indexing starts at 0).  If so, recursively partition it
+        if(median > 0){
+            // flip() inverts the boolean value (effectively changing the dimension we split on next) 
+            leftTree = sortedPoints;
+            leftTree = leftTree.subList(median, sizeOfTree);
+            leftChild = buildTree(leftTree, flip(bXDim), currParent); 
+        } 
+            
+        // check if there is a right partition 
+        if(median < sizeOfTree){
+            // flip() inverts the boolean value (effectively changing the dimension we split on next) 
+            rightTree = sortedPoints;
+            rightTree = rightTree.subList(0, median);
+            rightChild = buildTree(rightTree, flip(bXDim), currParent); 
+        }       
+        currParent.setLeftChild(leftChild); 
+        currParent.setLeftChild(rightChild); 
+ 
+        return currParent; 
+    }
+
 }
