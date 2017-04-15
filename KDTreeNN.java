@@ -120,25 +120,7 @@ public class KDTreeNN implements NearestNeigh{
                     }
                 } 
             }
-            while(numberOfNeighbours != 0){           
-                Node closestNode = tempNode;
-                returnArrayList.add(closestNode.getPoint());
-                if(closestNode.getParent() != null){
-                    if(returnArrayList.contains(closestNode.getParent()) == false){
-                        returnArrayList.add(closestNode.getParent().getPoint());
-                        numberOfNeighbours--;
-                    }  
-                }
-                if(closestNode.getLeftChild() != null){
-                    returnArrayList.add(closestNode.getLeftChild().getPoint());
-                    numberOfNeighbours--;
-                }
-                if(closestNode.getRightChild() != null){
-                    returnArrayList.add(closestNode.getRightChild().getPoint());
-                    numberOfNeighbours--;
-                }
-                closestNode = closestNode.getLeftChild();
-            }
+            
         }
         else{
             tempNode = restaurantRoot;
@@ -156,107 +138,11 @@ public class KDTreeNN implements NearestNeigh{
     //WE WANT TO ADD AS THE ROOT
     @Override
     public boolean addPoint(Point point) {
-        // To be implemented.
-        List<Point> returnArrayList = new ArrayList<Point>();
-        Node tempNode, headNode;
-     
-
-        double x, y;
-        boolean start, looper, looper2, looper3;
         
-        start = true;
-        looper = false;
-        looper2 = false;
-        looper3 = false;
-
-        x = point.lat;
-        y = point.lon;
-        headNode = restaurantRoot;
-        tempNode = restaurantRoot;
-        while(looper == false){
-            //x axis shit
-            if(start == true){
-                if(x > tempNode.getPoint().lat){
-                    if(tempNode.getRightChild() == null){
-                        looper = true;
-                    }
-                    else{
-                        tempNode = tempNode.getRightChild();
-                        start = false;
-                    }
-                }
-                else if(x < tempNode.getPoint().lat){
-                    if(tempNode.getLeftChild() == null){
-                        looper = true;
-                    }
-                    else{
-                        tempNode = tempNode.getLeftChild();
-                        start = false;
-                    }
-                }
-                else{
-                    looper = true;
-                }
-            }
-            //y axis shit
-            else{
-                if(y > tempNode.getPoint().lon){
-                    if(tempNode.getRightChild() == null){
-                        looper = true;
-                    }
-                    else{
-                        tempNode = tempNode.getRightChild();
-                        start = true;
-                    }
-                }
-                else if(y < tempNode.getPoint().lon){
-                    if(tempNode.getLeftChild() == null){
-                        looper = true;
-                    }
-                    else{
-                        tempNode = tempNode.getLeftChild();
-                        start = true;
-                    }
-                }
-                else{
-                    looper = true;
-                }
-            } 
-        }
-
-        headNode = tempNode;
-
-        while(looper2 == false;){
-
-            if(tempNode.getRightChild() != null){
-                returnArrayList.add(tempNode.getRightChild().getPoint());
-            }
-            if(tempNode.getLeftChild() != null){
-                returnArrayList.add(tempNode.getLeftChild().getPoint());
-                tempNode = getLeftChild();
-            } 
-            if(tempNode.getLeftChild() != null){
-                looper2 = true;
-            }
-        }
-
-        tempNode = headNode;
-
-        while(looper3 == false;){
-
-            if(tempNode.getRightChild() != null){
-                returnArrayList.add(tempNode.getRightChild().getPoint());
-                tempNode = getLeftChild();
-            }
-            else{
-                looper2 = true;
-            }
-        }
-
         return false;
     }
 
-    public
+    
     @Override
     public boolean deletePoint(Point point) {
         // To be implemented.
