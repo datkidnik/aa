@@ -125,11 +125,9 @@ public class KDTreeNN implements NearestNeigh{
         else{
             tempNode = restaurantRoot;
         }
-        int sizeeee = returnArrayList.size();
-        int t;
-        for(t=0; t<sizeeee; t++){
-            System.out.println(returnArrayList.get(t));
-        }
+        returnArrayList.add(tempNode.getPoint());
+
+        System.out.println(returnArrayList.get(0));
         
         return returnArrayList;
     }
