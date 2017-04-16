@@ -71,16 +71,16 @@ public class KDTreeNN implements NearestNeigh{
         int i = 0;
         while(returnArrayList.size() < k){
             
-        closestNode = findClosest(searchTerm, headNode);
+        closestNode = findClosest(searchTerm, headNode, returnArrayList);
         returnArrayList.add(i, closestNode.point);
         i++;
-        System.out.println("closest node added to return array list");
+        System.out.println("Node: "+ closestNode.point.id + " added to return array list. Distance: " + searchTerm.distTo(closestNode.getPoint()));
     }
         return returnArrayList;
     }
 
     
-    public Node findClosest(Point searchTerm, Node parent) {
+    public Node findClosest(Point searchTerm, Node parent, List<Point> winners) {
         // To be implemented.
         double x, y;
         x = searchTerm.lat;
@@ -88,19 +88,29 @@ public class KDTreeNN implements NearestNeigh{
         int jon = 1;
         List<Point> returnArrayList = new ArrayList<Point>();
         Node tempNode = parent, leftChild = null, rightChild = null;
-        
+        //if (tempNode.getLeftChild().getLeftChild() == null) {
+          //      System.out.println("left child  null");
+            //}
         if (tempNode.getLeftChild() == null && tempNode.getRightChild() == null){
                 return tempNode;
             }
             //System.out.println("Node has children");
             //x axis shit
-
-            leftChild = findClosest(searchTerm, tempNode.getLeftChild());
-            rightChild = findClosest(searchTerm, tempNode.getRightChild());
-            
-
-            if (tempNode.getPoint().distTo(searchTerm) > Math.abs(searchTerm.lat)-Math.abs(tempNode.getPoint().lat)) {}
-                        
+            if (tempNode.getLeftChild()!=null) {
+                leftChild = findClosest(searchTerm, tempNode.getLeftChild(), winners);    
+            }
+            if (tempNode.getRightChild()!=null) {
+                rightChild = findClosest(searchTerm, tempNode.getRightChild(), winners);
+            }
+                
+            if (winners.contains(leftChild.getPoint())) {
+                //System.out.println("Node alreeady on list");
+                leftChild=tempNode;
+            }        
+            if (winners.contains(rightChild.getPoint())) {
+                //System.out.println("Node alreeady on list");
+                rightChild=tempNode;
+            }
 
 
 
@@ -505,7 +515,3 @@ public class Node
     }
 
 }
-
-
-
-
