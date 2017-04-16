@@ -97,17 +97,20 @@ public class KDTreeNN implements NearestNeigh{
 
 
 
-
-        
-            if (leftChild != null && searchTerm.distTo(leftChild.getPoint())<searchTerm.distTo(tempNode.getPoint())) {
-                tempNode=leftChild;
+System.out.println("tempNode distance: " + searchTerm.distTo(tempNode.getPoint()));
+        Node closestNode = tempNode;
+    System.out.println("comparing: " + searchTerm.distTo(leftChild.getPoint())+ " with " + searchTerm.distTo(rightChild.getPoint()) + " with " + searchTerm.distTo(tempNode.getPoint()));
+            if (searchTerm.distTo(leftChild.getPoint()) < searchTerm.distTo(tempNode.getPoint())) {
+                System.out.println("closest: " + searchTerm.distTo(leftChild.getPoint()));
+                closestNode=leftChild;
             }
-            else
-                if (rightChild != null && searchTerm.distTo(rightChild.getPoint())<searchTerm.distTo(tempNode.getPoint())) {
-                    tempNode=rightChild;
+             if (searchTerm.distTo(rightChild.getPoint())<searchTerm.distTo(closestNode.getPoint())) {
+                    System.out.println("closest: " + searchTerm.distTo(rightChild.getPoint()));
+                    closestNode=rightChild;
                 }
-                System.out.println("returning: " + tempNode.getPoint());
-            return tempNode;
+                //System.out.println("returning: " + tempNode.getPoint());
+                System.out.println("distance: " + searchTerm.distTo(closestNode.getPoint()));
+            return closestNode;
 
 /*
 
@@ -495,5 +498,6 @@ public class Node
     }
 
 }
+
 
 
