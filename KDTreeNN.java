@@ -68,7 +68,14 @@ public class KDTreeNN implements NearestNeigh{
         else {
             headNode = hospitalRoot;
         }
+        int i = 0;
+        while(returnArrayList.size() < k){
+            
         closestNode = findClosest(searchTerm, headNode);
+        returnArrayList.add(i, closestNode.point);
+        i++;
+        System.out.println("closest node added to return array list");
+    }
         return returnArrayList;
     }
 
@@ -85,7 +92,7 @@ public class KDTreeNN implements NearestNeigh{
         if (tempNode.getLeftChild() == null && tempNode.getRightChild() == null){
                 return tempNode;
             }
-            System.out.println("Node has children");
+            //System.out.println("Node has children");
             //x axis shit
 
             leftChild = findClosest(searchTerm, tempNode.getLeftChild());
@@ -97,19 +104,19 @@ public class KDTreeNN implements NearestNeigh{
 
 
 
-System.out.println("tempNode distance: " + searchTerm.distTo(tempNode.getPoint()));
+        //System.out.println("tempNode distance: " + searchTerm.distTo(tempNode.getPoint()));
         Node closestNode = tempNode;
-    System.out.println("comparing: " + searchTerm.distTo(leftChild.getPoint())+ " with " + searchTerm.distTo(rightChild.getPoint()) + " with " + searchTerm.distTo(tempNode.getPoint()));
+        //System.out.println("comparing: " + searchTerm.distTo(leftChild.getPoint())+ " with " + searchTerm.distTo(rightChild.getPoint()) + " with " + searchTerm.distTo(tempNode.getPoint()));
             if (searchTerm.distTo(leftChild.getPoint()) < searchTerm.distTo(tempNode.getPoint())) {
-                System.out.println("closest: " + searchTerm.distTo(leftChild.getPoint()));
+                //System.out.println("closest: " + searchTerm.distTo(leftChild.getPoint()));
                 closestNode=leftChild;
             }
              if (searchTerm.distTo(rightChild.getPoint())<searchTerm.distTo(closestNode.getPoint())) {
-                    System.out.println("closest: " + searchTerm.distTo(rightChild.getPoint()));
+                    //System.out.println("closest: " + searchTerm.distTo(rightChild.getPoint()));
                     closestNode=rightChild;
                 }
                 //System.out.println("returning: " + tempNode.getPoint());
-                System.out.println("distance: " + searchTerm.distTo(closestNode.getPoint()));
+                //System.out.println("distance: " + searchTerm.distTo(closestNode.getPoint()));
             return closestNode;
 
 /*
@@ -498,6 +505,7 @@ public class Node
     }
 
 }
+
 
 
 
