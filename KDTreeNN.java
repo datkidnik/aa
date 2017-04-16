@@ -87,27 +87,17 @@ public class KDTreeNN implements NearestNeigh{
             }
             System.out.println("Node has children");
             //x axis shit
-            if(tempNode.getDimension() == true){
-                System.out.println("splitting on x");
-                    if(x > tempNode.getPoint().lat){
-                        leftChild=findClosest(searchTerm, tempNode.getLeftChild());
-                    }
-                    else{
-                        leftChild=findClosest(searchTerm, tempNode.getRightChild());
-                    }
 
-                }
-                //y axis shit
-                else{
-                    System.out.println("splitting on y");
-                    if(y > tempNode.getPoint().lon){
-                        rightChild=findClosest(searchTerm, tempNode.getRightChild());
+            leftChild = findClosest(searchTerm, tempNode.getLeftChild());
+            rightChild = findClosest(searchTerm, tempNode.getRightChild());
+            
 
-                    }
-                    else{
-                        rightChild=findClosest(searchTerm, tempNode.getLeftChild());
-                    }
-                    }
+            if (tempNode.getPoint().distTo(searchTerm) > Math.abs(searchTerm.lat)-Math.abs(tempNode.getPoint().lat)) {}
+                        
+
+
+
+
         
             if (leftChild != null && searchTerm.distTo(leftChild.getPoint())<searchTerm.distTo(tempNode.getPoint())) {
                 tempNode=leftChild;
@@ -505,4 +495,5 @@ public class Node
     }
 
 }
+
 
