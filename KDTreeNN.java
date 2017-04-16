@@ -54,100 +54,160 @@ public class KDTreeNN implements NearestNeigh{
 
     @Override
     public List<Point> search(Point searchTerm, int k) {
-        // To be implemented.
-        int jon = 1;
+        Node closestNode, headNode;
         List<Point> returnArrayList = new ArrayList<Point>();
-        Node tempNode, headNode;
         int numberOfNeighbours = (k-1);
-
         String thisCat = searchTerm.cat.name();
 
         if (thisCat == "RESTAURANT") {
             headNode = restaurantRoot;
-            tempNode = restaurantRoot;
         }
         else if (thisCat == "EDUCATION") {
             headNode = educationRoot;
-            tempNode = educationRoot;
         }
         else {
             headNode = hospitalRoot;
-            tempNode = hospitalRoot;
         }
+        closestNode = findClosest(searchTerm, headNode);
+        return returnArrayList;
+    }
 
-        
-
-        if(jon == 1){
-            double x, y;
-            boolean start, looper;
-            
-            start = true;
-            looper = false;
-
-            x = searchTerm.lat;
+    
+    public Node findClosest(Point searchTerm, Node parent) {
+        // To be implemented.
+        double x, y;
+        x = searchTerm.lat;
             y = searchTerm.lon;
-            
-            while(looper == false){
-                //x axis shit
-                if(start == true){
+        int jon = 1;
+        List<Point> returnArrayList = new ArrayList<Point>();
+        Node tempNode = parent, leftChild = null, rightChild = null;
+        
+        if (tempNode.getLeftChild() == null && tempNode.getRightChild() == null){
+                return tempNode;
+            }
+            System.out.println("Node has children");
+            //x axis shit
+            if(tempNode.getDimension() == true){
+                System.out.println("splitting on x");
                     if(x > tempNode.getPoint().lat){
-                        if(tempNode.getRightChild() == null){
-                            looper = true;
-                        }
-                        else{
-                            tempNode = tempNode.getRightChild();
-                            start = false;
-                        }
-                    }
-                    else if(x < tempNode.getPoint().lat){
-                        if(tempNode.getLeftChild() == null){
-                            looper = true;
-                        }
-                        else{
-                            tempNode = tempNode.getLeftChild();
-                            start = false;
-                        }
+                        leftChild=findClosest(searchTerm, tempNode.getLeftChild());
                     }
                     else{
-                        looper = true;
+                        leftChild=findClosest(searchTerm, tempNode.getRightChild());
                     }
+
                 }
                 //y axis shit
                 else{
+                    System.out.println("splitting on y");
                     if(y > tempNode.getPoint().lon){
-                        if(tempNode.getRightChild() == null){
-                            looper = true;
-                        }
-                        else{
-                            tempNode = tempNode.getRightChild();
-                            start = true;
-                        }
-                    }
-                    else if(y < tempNode.getPoint().lon){
-                        if(tempNode.getLeftChild() == null){
-                            looper = true;
-                        }
-                        else{
-                            tempNode = tempNode.getLeftChild();
-                            start = true;
-                        }
+                        rightChild=findClosest(searchTerm, tempNode.getRightChild());
+
                     }
                     else{
-                        looper = true;
+                        rightChild=findClosest(searchTerm, tempNode.getLeftChild());
+                    }
+                    }
+        
+            if (leftChild != null && searchTerm.distTo(leftChild.getPoint())<searchTerm.distTo(tempNode.getPoint())) {
+                tempNode=leftChild;
+            }
+            else
+                if (rightChild != null && searchTerm.distTo(rightChild.getPoint())<searchTerm.distTo(tempNode.getPoint())) {
+                    tempNode=rightChild;
+                }
+                System.out.println("returning: " + tempNode.getPoint());
+            return tempNode;
+
+/*
+
+
+
+
+
+
+
+        if(jon == 1){
+            double x, y;
+            boolean start, closestFound;
+            
+            start = true;
+            closestFound = false;
+
+            x = searchTerm.lat;
+            y = searchTerm.lon;
+            int i = 0;
+            
+            while(returnArrayList.size()<k){
+                Node closestNode = null;
+                while(closestFound==false){
+                    
+                if (tempNode.getLeftChild() == null && tempNode.getRightChild() == null){
+                    
+                    if(closestFound==false){
+                        
+                        if (returnArrayList.size() == 0) {
+                            closestNode = tempNode;
+                            closestFound=true;
+                        }
+                        
+                        if (searchTerm.distTo(returnArrayList.get(i))<tempNode.getPoint().distTo(returnArrayList.get(i))) {
+                            
+                            closestFound=false;
+                        }
+                        
+                    }
+                }
+                System.out.println("Node has children");
+                //x axis shit
+                if(tempNode.getDimension() == true){
+                    System.out.println("going left");
+                    if(x > tempNode.getPoint().lat){
+                        tempNode=tempNode.getRightChild();
+                    }
+                    else{
+                        tempNode=tempNode.getLeftChild();
+                    }
+
+                }
+                //y axis shit
+                else{
+                    System.out.println("going right");
+                    if(y > tempNode.getPoint().lon){
+                        tempNode=tempNode.getRightChild();
+                    }
+                    else{
+                        tempNode=tempNode.getLeftChild();
                     }
                 } 
             }
-            
+
+            returnArrayList.add(i, closestNode.point);
+            i++;
+            }
+            System.out.println("closest found");
         }
         else{
             tempNode = headNode;
         }
-        returnArrayList.add(tempNode.getPoint());
-
-        System.out.println(returnArrayList.get(0));
         
-        return returnArrayList;
+
+        System.out.println("number of nodes" + returnArrayList.size() + "; " + returnArrayList);
+        */
+        
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
     //DEPTH FIRST SEARCH NEEDS TO BE IMPLEMENTED HERE TO ADD ALL NODES (UNDER THE CLOSEST NODE) INTO ARRAYLIST AND THEN RECALL BUILDTREE FUNCTION USING THE NODE THAT
     //WE WANT TO ADD AS THE ROOT
@@ -182,6 +242,9 @@ public class KDTreeNN implements NearestNeigh{
                     if (tempNode.getPoint().lat > point.lat) {
                         tempNode.leftChild = new Node(point);
                         System.out.println("left child set");
+                        System.out.println("parent: "+tempNode.point);
+                        System.out.println("leftChild: "+tempNode.leftChild.point);
+                        System.out.println("rightChild: "+tempNode.rightChild.point);
                         done = true;
                     } 
                 }
@@ -190,6 +253,9 @@ public class KDTreeNN implements NearestNeigh{
                     if (tempNode.getPoint().lon > point.lat) {
                         tempNode.rightChild = new Node(point);
                         System.out.println("right child set");
+                        System.out.println("parent: "+tempNode.point);
+                        System.out.println("leftChild: "+tempNode.leftChild);
+                        System.out.println("rightChild: "+tempNode.rightChild);
                         done = true;
                     }
                 }
@@ -439,3 +505,4 @@ public class Node
     }
 
 }
+
