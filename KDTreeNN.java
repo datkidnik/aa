@@ -245,6 +245,8 @@ public class KDTreeNN implements NearestNeigh{
     @Override
     public boolean deletePoint(Point point) {
         Node closestNode, headNode;
+
+        boolean bool;
         List<Point> arrayList = new ArrayList<Point>();
         
         
@@ -266,8 +268,16 @@ public class KDTreeNN implements NearestNeigh{
 
         if (closestNode.getPoint().equals(point)) {
             System.out.println("node; " + closestNode.point + " found");
-            arrayList = getKids(closestNode);
-            System.out.println("kids of node; " + arrayList);
+            Node replacementNode = new Node(point);
+            bool = closestNode.getDimension();
+            if(arrayList.size() != 0){
+                arrayList = getKids(closestNode);
+                replacementNode = buildTree(arrayList, bool, closestNode);
+                replacementNode.setParent(closestNode.getParent());
+                System.out.println("Node " + closestNode.point + " replaced with node " + replacementNode.point);
+            }
+
+
             return true;
         }
         else {
@@ -510,3 +520,4 @@ public class Node
     }
 
 }
+
