@@ -16,6 +16,7 @@ public class KDTreeNN implements NearestNeigh{
     List<Point> educationStructure = new ArrayList<Point>();
     Node parent, hospitalRoot, restaurantRoot, educationRoot;
 
+//function for setting the root node if it is deleted
     public void setRoot(Node newRoot, String cat){
         Category category;
         category = Point.parseCat(cat);
@@ -33,6 +34,7 @@ public class KDTreeNN implements NearestNeigh{
                     break;
             }
     }
+
 
     @Override
     public void buildIndex(List<Point> points) {
@@ -56,20 +58,19 @@ public class KDTreeNN implements NearestNeigh{
             }
         }
         
-          
+        
         restaurantRoot = buildTree(restaurantStructure, true, null);
-        System.out.println("work");
-        System.out.println(restaurantRoot.getPoint());
-        System.out.println(restaurantRoot.getLeftChild().getPoint());
-        System.out.println(restaurantRoot.getRightChild().getPoint());
           
         educationRoot = buildTree(educationStructure, true, null);
-        
          
         hospitalRoot = buildTree(hospitalStructure, true, null);
      
     }
 
+
+
+    //search for a giving point, for this we find the right tree category and set the root accordingly, we then call findClosest 
+    //which finds the closest node to the point provided. if this nodes point matchs the given point the search has been successful
     @Override
     public List<Point> search(Point searchTerm, int k) {
         Node closestNode, headNode;
@@ -92,12 +93,14 @@ public class KDTreeNN implements NearestNeigh{
         closestNode = findClosest(searchTerm, headNode, returnArrayList);
         returnArrayList.add(i, closestNode.point);
         i++;
-        System.out.println("Node: "+ closestNode.point.id + " added to return array list. Distance: " + searchTerm.distTo(closestNode.getPoint()));
+        
     }
         return returnArrayList;
     }
 
-    
+    //findclosest searches through the tree much the same way it is constructed, but on the way back is compares the parent node
+    //to its children and sets the closest to tempNode. this permeates back up the chain and is returned by the function as the 
+    //closest node to the search
     public Node findClosest(Point searchTerm, Node parent, List<Point> winners) {
         // To be implemented.
         double x, y;
@@ -166,12 +169,15 @@ public class KDTreeNN implements NearestNeigh{
 
     //DEPTH FIRST SEARCH NEEDS TO BE IMPLEMENTED HERE TO ADD ALL NODES (UNDER THE CLOSEST NODE) INTO ARRAYLIST AND THEN RECALL BUILDTREE FUNCTION USING THE NODE THAT
     //WE WANT TO ADD AS THE ROOT
+
+    //addpoint searches through the tree looing for the closest point to branch the given point off. if it comes across the given point 
+    //it returns false, but otherwise it finds the closest leaf node and splices the given node onto it
     @Override
     public boolean addPoint(Point point) {
-        System.out.println("Adding point");
+        //System.out.println("Adding point");
         Node tempNode;
         Point tempPoint;
-        System.out.println(point.cat.name());
+        //System.out.println(point.cat.name());
         String thisCat = point.cat.name();
         boolean done = false, dim;
 
@@ -187,21 +193,19 @@ public class KDTreeNN implements NearestNeigh{
 
         while(done == false){
             if (tempNode.getPoint().equals(point)) {
-                System.out.println("Point already exsists");
+                //System.out.println("Point already exsists");
                 return false;    
             }
             //check if no kids, if none; set dimension to opposite of parents and set node as left or right child
             if (tempNode.getLeftChild() == null && tempNode.getRightChild() == null) {
-                System.out.println("no children");
+                //System.out.println("no children")
+                
                 boolean parentSplit = tempNode.getParent().getDimension();
                 if (parentSplit == true){
                     tempNode.setDimension(false);
                     if (tempNode.getPoint().lat > point.lat) {
                         tempNode.leftChild = new Node(point);
-                        System.out.println("left child set");
-                        System.out.println("parent: "+tempNode.point);
-                        System.out.println("leftChild: "+tempNode.leftChild.point);
-                        System.out.println("rightChild: "+tempNode.rightChild.point);
+                        tempNode.leftChild.setParent(tempNode);
                         done = true;
                     } 
                 }
@@ -209,10 +213,7 @@ public class KDTreeNN implements NearestNeigh{
                     tempNode.setDimension(true);
                     if (tempNode.getPoint().lon > point.lat) {
                         tempNode.rightChild = new Node(point);
-                        System.out.println("right child set");
-                        System.out.println("parent: "+tempNode.point);
-                        System.out.println("leftChild: "+tempNode.leftChild);
-                        System.out.println("rightChild: "+tempNode.rightChild);
+                        tempNode.rightChild.setParent(tempNode);
                         done = true;
                     }
                 }
@@ -221,32 +222,47 @@ public class KDTreeNN implements NearestNeigh{
                 return true;
             }
             //if no left child set as left and vice versa for right
-            //System.out.println("lefty" + tempNode.getLeftChild().point);
-            if (tempNode.getLeftChild() == null) {
-                System.out.println("Node set as left child");
-                tempNode.leftChild = new Node(point);
-                return true;
-            }
-            //System.out.println("righty" + tempNode.getRightChild().point);
-            if (tempNode.getRightChild() == null) {
-                System.out.println("Node set as right child");
-                tempNode.rightChild = new Node(point);
-                return true;
-            }
+            
+            
 
 
             //check dimension of node with children, follow correct path
             if (tempNode.getDimension() == true){
+                if (tempNode.getLeftChild() == null) {
+                tempNode.leftChild = new Node(point);
+                tempNode.leftChild.setParent(tempNode);
+                return true;
+            }
+            
+            if (tempNode.getRightChild() == null) {
+                tempNode.rightChild = new Node(point);
+                tempNode.rightChild.setParent(tempNode);
+                return true;
+            }
                 if(tempNode.getPoint().lat > tempNode.getRightChild().getPoint().lat){
                     tempNode = tempNode.getRightChild();
+
                 }
                 else{
                     tempNode = tempNode.getLeftChild();
+                    
                 }
             }
             else{
+                if (tempNode.getLeftChild() == null) {
+                tempNode.leftChild = new Node(point);
+                tempNode.leftChild.setParent(tempNode);
+                return true;
+            }
+            
+            if (tempNode.getRightChild() == null) {
+                tempNode.rightChild = new Node(point);
+                tempNode.rightChild.setParent(tempNode);
+                return true;
+            }
                 if(tempNode.getPoint().lon > tempNode.getRightChild().getPoint().lon){
                     tempNode = tempNode.getRightChild();
+
                 }
                 else{
                     tempNode = tempNode.getLeftChild();
@@ -257,10 +273,12 @@ public class KDTreeNN implements NearestNeigh{
         return true;
     }
 
-    
+    //delete point also uses closest node to find the closest point to the one given, if the closest point is the point for deletion it 
+    //is removed. it doesnt quite set the parents properly afterwards though for some reason. it gives a null pointer exception when 
+    //calling getleftnode() on the parent node
     @Override
     public boolean deletePoint(Point point) {
-        System.out.println("deleting point");
+        //System.out.println("deleting point");
         Node closestNode, headNode;
 
         boolean bool;
@@ -284,7 +302,6 @@ public class KDTreeNN implements NearestNeigh{
         closestNode = findClosest(point, headNode, arrayList);
 
         if (closestNode.getPoint().equals(point)) {
-            System.out.println("node; " + closestNode.point + " found");
             Node replacementNode = new Node(point);
             Node parent;
             bool = closestNode.getDimension();
@@ -293,14 +310,15 @@ public class KDTreeNN implements NearestNeigh{
                 if (closestNode!=headNode) {
                     replacementNode = buildTree(arrayList, bool, closestNode);
                     parent = closestNode.getParent();
-                    //if (parent.getLeftChild() == closestNode) {
-                    //    closestNode.getParent().setLeftChild(replacementNode);
-                    //}
-                    //if (parent.getRightChild() == closestNode) {
-                    //    closestNode.getParent().setRightChild(replacementNode);
-                    //}
+                    System.out.println("closestNode: " + closestNode.point + " child " + replacementNode.getParent().getLeftChild().getPoint());
+                    if (replacementNode.getParent().getLeftChild() == closestNode) {
+                        closestNode.getParent().setLeftChild(replacementNode);
+                    }
+                    if (parent.getRightChild() == closestNode) {
+                        closestNode.getParent().setRightChild(replacementNode);
+                    }
                     replacementNode.setParent(closestNode.getParent());
-                    System.out.println("Head node " + closestNode.point + " replaced with node " + replacementNode.point);
+                    //System.out.println("Head node " + closestNode.point + " replaced with node " + replacementNode.point);
                     return true;
                 }
                 replacementNode = buildTree(arrayList, bool, closestNode);
@@ -313,15 +331,15 @@ public class KDTreeNN implements NearestNeigh{
                 else {
                     setRoot(replacementNode, thisCat);
                 }
-                System.out.println("Node " + closestNode.point + " replaced with node " + replacementNode.point);
+                //System.out.println("Node " + closestNode.point + " replaced with node " + replacementNode.point);
             }
 
 
             return true;
         }
         else {
-            System.out.println("node at point; " + point + " not found");
-            System.out.println("closest node; " + closestNode.point);
+            //System.out.println("node at point; " + point + " not found");
+            //System.out.println("closest node; " + closestNode.point);
             return false;
         }   
     }
@@ -361,9 +379,10 @@ public class KDTreeNN implements NearestNeigh{
         return returnList;
     }
 
+    //ispointin also uses findclosest to search for a given node much like delete, but it only returns true if it is found
     @Override
     public boolean isPointIn(Point point) {
-        System.out.println("checking if point exists in tree");
+        //System.out.println("checking if point exists in tree");
         Node headNode, closestNode;
         String thisCat = point.cat.name();
         List<Point> emptyList = new ArrayList<Point>();
@@ -379,9 +398,9 @@ public class KDTreeNN implements NearestNeigh{
         }
 
         closestNode = findClosest(point, headNode, emptyList);
-        System.out.println("checking if closest node is target node");
+        
         if (closestNode.getPoint().equals(point)) {
-            System.out.println("point found");
+            //System.out.println("point found");
             return true;
         }
 
@@ -434,12 +453,6 @@ public class KDTreeNN implements NearestNeigh{
         }
     }
     
-    /*public buildNode(Point median){
-        newNode.setParent(null);
-        newNode.setLeftChild(null);
-        newNode.setRightChild(null);
-        newNode.setCurrPoint(median);
-    }*/
 
     public boolean flip(boolean ans){
         if(ans == true){
@@ -580,4 +593,5 @@ public class Node
     }
 
 }
+
 
