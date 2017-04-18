@@ -76,19 +76,30 @@ public class KDTreeNN implements NearestNeigh{
         Node closestNode, headNode;
         List<Point> returnArrayList = new ArrayList<Point>();
         int numberOfNeighbours = (k-1);
+        int arrySize;
         String thisCat = searchTerm.cat.name();
 
         if (thisCat == "RESTAURANT") {
             headNode = restaurantRoot;
+            arrySize = restaurantStructure.size();
         }
         else if (thisCat == "EDUCATION") {
             headNode = educationRoot;
+            arrySize = educationStructure.size();
         }
         else {
             headNode = hospitalRoot;
+            arrySize = hospitalStructure.size();
         }
         int i = 0;
-        while(returnArrayList.size() < k){
+        int use;
+        if(k > arrySize){
+            use = arrySize;
+        }
+        else{
+            use = k;
+        }
+        while(returnArrayList.size() < use){
             
         closestNode = findClosest(searchTerm, headNode, returnArrayList);
         returnArrayList.add(i, closestNode.point);
