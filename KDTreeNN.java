@@ -16,6 +16,26 @@ public class KDTreeNN implements NearestNeigh{
     List<Point> educationStructure = new ArrayList<Point>();
     Node parent, hospitalRoot, restaurantRoot, educationRoot;
 
+//function for setting the root node if it is deleted
+    public void setRoot(Node newRoot, String cat){
+        Category category;
+        category = Point.parseCat(cat);
+        switch(category){
+                case RESTAURANT:
+                    restaurantRoot = newRoot;
+                    break;
+                case EDUCATION:
+                    educationRoot = newRoot;
+                    break;
+                case HOSPITAL:
+                    hospitalRoot = newRoot;
+                    break;
+                default:
+                    break;
+            }
+    }
+
+
     @Override
     public void buildIndex(List<Point> points) {
         List<Point> sortedPoints = new ArrayList<Point>();
@@ -38,171 +58,370 @@ public class KDTreeNN implements NearestNeigh{
             }
         }
         
-          
+        
         restaurantRoot = buildTree(restaurantStructure, true, null);
-        System.out.println("work");
-        System.out.println(restaurantRoot.getPoint());
-        System.out.println(restaurantRoot.getLeftChild().getPoint());
-        System.out.println(restaurantRoot.getRightChild().getPoint());
           
         educationRoot = buildTree(educationStructure, true, null);
-        
          
         hospitalRoot = buildTree(hospitalStructure, true, null);
      
     }
 
+
+
+    //search for a giving point, for this we find the right tree category and set the root accordingly, we then call findClosest 
+    //which finds the closest node to the point provided. if this nodes point matchs the given point the search has been successful
     @Override
     public List<Point> search(Point searchTerm, int k) {
-        // To be implemented.
-        int jon = 1;
+        Node closestNode, headNode;
         List<Point> returnArrayList = new ArrayList<Point>();
-        Node tempNode, headNode;
         int numberOfNeighbours = (k-1);
-        if(/*searchTerm.cat == RESTAURANT*/ jon == 1){
-            double x, y;
-            boolean start, looper;
-            
-            start = true;
-            looper = false;
+        int arrySize;
+        String thisCat = searchTerm.cat.name();
 
-            x = searchTerm.lat;
-            y = searchTerm.lon;
+        if (thisCat == "RESTAURANT") {
             headNode = restaurantRoot;
-            tempNode = restaurantRoot;
-            while(looper == false){
-                //x axis shit
-                if(start == true){
-                    if(x > tempNode.getPoint().lat){
-                        if(tempNode.getRightChild() == null){
-                            looper = true;
-                        }
-                        else{
-                            tempNode = tempNode.getRightChild();
-                            start = false;
-                        }
-                    }
-                    else if(x < tempNode.getPoint().lat){
-                        if(tempNode.getLeftChild() == null){
-                            looper = true;
-                        }
-                        else{
-                            tempNode = tempNode.getLeftChild();
-                            start = false;
-                        }
-                    }
-                    else{
-                        looper = true;
-                    }
-                }
-                //y axis shit
-                else{
-                    if(y > tempNode.getPoint().lon){
-                        if(tempNode.getRightChild() == null){
-                            looper = true;
-                        }
-                        else{
-                            tempNode = tempNode.getRightChild();
-                            start = true;
-                        }
-                    }
-                    else if(y < tempNode.getPoint().lon){
-                        if(tempNode.getLeftChild() == null){
-                            looper = true;
-                        }
-                        else{
-                            tempNode = tempNode.getLeftChild();
-                            start = true;
-                        }
-                    }
-                    else{
-                        looper = true;
-                    }
-                } 
-            }
-            
+            arrySize = restaurantStructure.size();
+        }
+        else if (thisCat == "EDUCATION") {
+            headNode = educationRoot;
+            arrySize = educationStructure.size();
+        }
+        else {
+            headNode = hospitalRoot;
+            arrySize = hospitalStructure.size();
+        }
+        int i = 0;
+        int use;
+        if(k > arrySize){
+            use = arrySize;
         }
         else{
-            tempNode = restaurantRoot;
+            use = k;
         }
-        returnArrayList.add(tempNode.getPoint());
-
-        System.out.println(returnArrayList.get(0));
+        while(returnArrayList.size() < use){
+            
+        closestNode = findClosest(searchTerm, headNode, returnArrayList);
+        returnArrayList.add(i, closestNode.point);
+        i++;
         
+    }
         return returnArrayList;
     }
 
+    //findclosest searches through the tree much the same way it is constructed, but on the way back is compares the parent node
+    //to its children and sets the closest to tempNode. this permeates back up the chain and is returned by the function as the 
+    //closest node to the search
+    public Node findClosest(Point searchTerm, Node parent, List<Point> winners) {
+        
+        
+
+        // To be implemented.
+        double x, y;
+        x = searchTerm.lat;
+            y = searchTerm.lon;
+        int jon = 1;
+        List<Point> returnArrayList = new ArrayList<Point>();
+        Node tempNode = parent, leftChild = null, rightChild = null;
+        if (tempNode.getLeftChild() == null && tempNode.getRightChild() == null){
+                return tempNode;
+            }
+            //System.out.println("Node has children");
+            //x axis shit
+            
+            if (tempNode.getLeftChild()!=null) {
+                leftChild = findClosest(searchTerm, tempNode.getLeftChild(), winners);    
+            }
+            if (tempNode.getRightChild()!=null) {
+                rightChild = findClosest(searchTerm, tempNode.getRightChild(), winners);
+            }
+            if (tempNode.getLeftChild()==null) {
+                leftChild = rightChild;
+            }
+            if (tempNode.getRightChild()==null) {
+                rightChild = leftChild;
+            }
+                
+            if (winners.contains(leftChild.getPoint())) {
+                //System.out.println("Node alreeady on list");
+                leftChild=tempNode;
+            }        
+            if (winners.contains(rightChild.getPoint())) {
+                //System.out.println("Node alreeady on list");
+                rightChild=tempNode;
+            }
+
+
+
+        //System.out.println("tempNode distance: " + searchTerm.distTo(tempNode.getPoint()));
+        Node closestNode = tempNode;
+        //System.out.println("comparing: " + searchTerm.distTo(leftChild.getPoint())+ " with " + searchTerm.distTo(rightChild.getPoint()) + " with " + searchTerm.distTo(tempNode.getPoint()));
+            if (searchTerm.distTo(leftChild.getPoint()) < searchTerm.distTo(tempNode.getPoint())) {
+                //System.out.println("closest: " + searchTerm.distTo(leftChild.getPoint()));
+                closestNode=leftChild;
+            }
+            if (searchTerm.distTo(rightChild.getPoint())<searchTerm.distTo(closestNode.getPoint())) {
+                //System.out.println("closest: " + searchTerm.distTo(rightChild.getPoint()));
+                closestNode=rightChild;
+            }
+               
+            return closestNode;
+        
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
     //DEPTH FIRST SEARCH NEEDS TO BE IMPLEMENTED HERE TO ADD ALL NODES (UNDER THE CLOSEST NODE) INTO ARRAYLIST AND THEN RECALL BUILDTREE FUNCTION USING THE NODE THAT
     //WE WANT TO ADD AS THE ROOT
+
+    //addpoint searches through the tree looing for the closest point to branch the given point off. if it comes across the given point 
+    //it returns false, but otherwise it finds the closest leaf node and splices the given node onto it
     @Override
     public boolean addPoint(Point point) {
+        //System.out.println("Adding point");
+        Node tempNode;
+        Point tempPoint;
+        //System.out.println(point.cat.name());
+        String thisCat = point.cat.name();
+        boolean done = false, dim;
+
+        if (thisCat == "RESTAURANT") {
+            tempNode = restaurantRoot;
+        }
+        else if (thisCat == "EDUCATION") {
+            tempNode = educationRoot;
+        }
+        else{
+            tempNode = hospitalRoot;
+        }
+
+        while(done == false){
+            if (tempNode.getPoint().equals(point)) {
+                //System.out.println("Point already exsists");
+                return false;    
+            }
+            System.out.println(tempNode.point);
+            //System.out.println(tempNode.getParent().point);
+            //check if no kids, if none; set dimension to opposite of parents and set node as left or right child
+            if (tempNode.getLeftChild() == null && tempNode.getRightChild() == null) {
+                //System.out.println("no children")
+                
+                boolean parentSplit = tempNode.getParent().getDimension();
+                if (parentSplit == true){
+                    tempNode.setDimension(false);
+                    if (tempNode.getPoint().lat > point.lat) {
+                        tempNode.leftChild = new Node(point);
+                        tempNode.leftChild.setParent(tempNode);
+                        done = true;
+                    } 
+                }
+                else{
+                    tempNode.setDimension(true);
+                    if (tempNode.getPoint().lon > point.lat) {
+                        tempNode.rightChild = new Node(point);
+                        tempNode.rightChild.setParent(tempNode);
+                        done = true;
+                    }
+                }
+            }
+            if (done == true) {
+                return true;
+            }
+            //if no left child set as left and vice versa for right
+            
+            
+
+
+            //check dimension of node with children, follow correct path
+            if (tempNode.getDimension() == true){
+                if (tempNode.getLeftChild() == null) {
+                tempNode.leftChild = new Node(point);
+                tempNode.leftChild.setParent(tempNode);
+                return true;
+            }
+            
+            if (tempNode.getRightChild() == null) {
+                tempNode.rightChild = new Node(point);
+                tempNode.rightChild.setParent(tempNode);
+                return true;
+            }
+                if(tempNode.getPoint().lat > tempNode.getRightChild().getPoint().lat){
+                    tempNode = tempNode.getRightChild();
+                }
+                else{
+                    tempNode = tempNode.getLeftChild();
+                }
+            }
+            else{
+                if (tempNode.getLeftChild() == null) {
+                tempNode.leftChild = new Node(point);
+                tempNode.leftChild.setParent(tempNode);
+                return true;
+            }
+            
+            if (tempNode.getRightChild() == null) {
+                tempNode.rightChild = new Node(point);
+                tempNode.rightChild.setParent(tempNode);
+                return true;
+            }
+                if(tempNode.getPoint().lon > tempNode.getRightChild().getPoint().lon){
+                    tempNode = tempNode.getRightChild();
+
+                }
+                else{
+                    tempNode = tempNode.getLeftChild();
+                }
+            }
+        }
+
+        return true;
+    }
+
+    //delete point also uses closest node to find the closest point to the one given, if the closest point is the point for deletion it 
+    //is removed. it doesnt quite set the parents properly afterwards though for some reason. it gives a null pointer exception when 
+    //calling getleftnode() on the parent node
+    @Override
+    public boolean deletePoint(Point point) {
+        //System.out.println("deleting point");
+        Node closestNode, headNode;
+
+        boolean bool;
+        List<Point> arrayList = new ArrayList<Point>();
         
+        
+        String thisCat = point.cat.name();
+
+        if (thisCat == "RESTAURANT") {
+            headNode = restaurantRoot;
+        }
+        else if (thisCat == "EDUCATION") {
+            headNode = educationRoot;
+        }
+        else {
+            headNode = hospitalRoot;
+        }
+        
+        
+            
+        closestNode = findClosest(point, headNode, arrayList);
+
+        if (closestNode.getPoint().equals(point)) {
+            Node replacementNode = new Node(point);
+            Node parent;
+            bool = closestNode.getDimension();
+            arrayList = getKids(closestNode);
+            if(arrayList.size() != 0){
+                if (closestNode!=headNode) {
+                    replacementNode = buildTree(arrayList, bool, closestNode);
+                    parent = closestNode.getParent();
+                    //System.out.println("closestNode: " + closestNode.point + " child " + replacementNode.getParent().getLeftChild().getPoint());
+                    if (replacementNode.getParent().getLeftChild() == closestNode) {
+                        closestNode.getParent().setLeftChild(replacementNode);
+                    }
+                    if (replacementNode.getParent().getRightChild() == closestNode) {
+                        closestNode.getParent().setRightChild(replacementNode);
+                    }
+                    replacementNode.setParent(closestNode.getParent());
+                    //System.out.println("Head node " + closestNode.point + " replaced with node " + replacementNode.point);
+                    return true;
+                }
+                replacementNode = buildTree(arrayList, bool, closestNode);
+                if (thisCat == "RESTAURANT") {
+                    setRoot(replacementNode, thisCat);
+                }
+                else if (thisCat == "EDUCATION") {
+                    setRoot(replacementNode, thisCat);
+                }
+                else {
+                    setRoot(replacementNode, thisCat);
+                }
+                //System.out.println("Node " + closestNode.point + " replaced with node " + replacementNode.point);
+            }
+
+
+            return true;
+        }
+        else {
+            //System.out.println("node at point; " + point + " not found");
+            //System.out.println("closest node; " + closestNode.point);
+            return false;
+        }   
+    }
+
+    public List<Point> getKids(Node topNode){
+        List<Point> returnList = new ArrayList<Point>();
+        List<Point> leftList = new ArrayList<Point>();
+        List<Point> rightList = new ArrayList<Point>();
+
+        if (topNode.getLeftChild() == null && topNode.getRightChild() == null)  {
+            
+            returnList.add(0, topNode.getPoint());
+            return returnList;
+        }
+
+        if (topNode.getLeftChild() != null) {
+            leftList = getKids(topNode.getLeftChild());
+        }
+
+        if (topNode.getRightChild() != null) {
+            rightList = getKids(topNode.getRightChild());   
+        }
+        int i = 0, k = 0;
+        while(i<leftList.size()){
+            returnList.add(k, leftList.get(i));
+            i++;
+            k++;
+        }
+        i=0;
+        while(i<rightList.size()){
+            
+            returnList.add(k, rightList.get(i));
+            i++;
+            k++;
+        }
+        returnList.add(k, topNode.getPoint());
+        return returnList;
+    }
+
+    //ispointin also uses findclosest to search for a given node much like delete, but it only returns true if it is found
+    @Override
+    public boolean isPointIn(Point point) {
+        //System.out.println("checking if point exists in tree");
+        Node headNode, closestNode;
+        String thisCat = point.cat.name();
+        List<Point> emptyList = new ArrayList<Point>();
+
+        if (thisCat == "RESTAURANT") {
+            headNode = restaurantRoot;
+        }
+        else if (thisCat == "EDUCATION") {
+            headNode = educationRoot;
+        }
+        else {
+            headNode = hospitalRoot;
+        }
+
+        closestNode = findClosest(point, headNode, emptyList);
+        
+        if (closestNode.getPoint().equals(point)) {
+            //System.out.println("point found");
+            return true;
+        }
+
         return false;
     }
 
     
-    @Override
-    public boolean deletePoint(Point point) {
-        // To be implemented.
-        
-        
-        return false;
-    }
-
-    @Override
-    public boolean isPointIn(Point point) {
-        // To be implemented.
-        Stack<Node> s = new Stack<Node>();
-        boolean found = false;
-        s.add(restaurantRoot);
-        while (found == false) {
-            Node x = s.pop();
-            if(x.getPoint().equals(point)){
-                System.out.print(x.getPoint());
-                found = true;
-                return true;
-            }
-            else{
-                if(x.getRightChild()!=null){
-                    s.add(x.getRightChild());
-                } 
-                if(x.getLeftChild()!=null){
-                    s.add(x.getLeftChild()); 
-                }
-            }
-        }
-        return false;
-    }
-
-    /*public Node doesItExist(Node checkParent, Point point){
-        Node leftChild, rightChild, foundNode;
-        if(checkParent.getLeftChild() != null){
-            if(checkParent.getLeftChild().getPoint().equals(point)){
-                foundNode = new Node(checkParent.getLeftChild().getPoint());
-                return foundNode;
-            }
-        }
-        if(checkParent.getRightChild() != null){
-            if(checkParent.getRightChild().getPoint().equals(point)){
-                foundNode = new Node(checkParent.getRightChild().getPoint());
-                return foundNode;
-            }
-        }
-        
-        if(checkParent.getLeftChild() != null){
-            leftChild = new Node(checkParent.getLeftChild().getPoint());
-           
-            return doesItExist(leftChild, point);
-        }
-        else if(checkParent.getRightChild() != null){
-            rightChild = new Node(checkParent.getRightChild().getPoint());                
-            return doesItExist(rightChild, point);
-        }
-        else{
-            return checkParent;
-        }
-        return checkParent;
-    }*/
     
     public List<Point> sortTree(List<Point> unSortedList, boolean bXDim){
         Point temp;
@@ -248,12 +467,6 @@ public class KDTreeNN implements NearestNeigh{
         }
     }
     
-    /*public buildNode(Point median){
-        newNode.setParent(null);
-        newNode.setLeftChild(null);
-        newNode.setRightChild(null);
-        newNode.setCurrPoint(median);
-    }*/
 
     public boolean flip(boolean ans){
         if(ans == true){
@@ -278,25 +491,36 @@ public class KDTreeNN implements NearestNeigh{
         sizeOfTree = sortedPoints.size();
 
         if((points.size()) == 0){
-            return parent;
+            return null;
         }
         else{
             // find the median from sorted points 
+            
+            
+            
             median = findMedium(sortedPoints); 
 
             // construct a node for the median point 
+            
             currParent = new Node(sortedPoints.get(median));
-            if (sortedPoints.size() == 2) {        
+            currParent.setParent(parent); 
+            if (bXDim == true) {
+                currParent.setDimension(false);    
+            }
+            else{
+                currParent.setDimension(true);
+            }
+            /*if (sortedPoints.size() == 2) {        
                 leftChild = new Node(sortedPoints.get(0));
                 rightChild = new Node(sortedPoints.get(1));
                 currParent.setRightChild(rightChild);
                 currParent.setLeftChild(leftChild);
+                leftChild.setParent(parent); 
+                rightChild.setParent(parent); 
                 return currParent; 
-            }
-            else{
-                if(parent != null){
-                    currParent.setParent(parent); 
-                } 
+            }*/
+            //else{
+                
                 leftChild = null; 
                 rightChild = null; 
 
@@ -307,7 +531,11 @@ public class KDTreeNN implements NearestNeigh{
                 // flip() inverts the boolean value (effectively changing the dimension we split on next) 
                 leftTree = sortedPoints;
                 leftTree = leftTree.subList(0, median);
-                leftChild = buildTree(leftTree, flip(bXDim), currParent); 
+                leftChild = new Node(sortedPoints.get(findMedium(leftTree)));
+                leftChild = buildTree(leftTree, flip(bXDim), leftChild); 
+                if (leftChild!= null) {
+                leftChild.setParent(parent);    
+                }
                 
                     
                 // check if there is a right partition 
@@ -315,13 +543,19 @@ public class KDTreeNN implements NearestNeigh{
                 // flip() inverts the boolean value (effectively changing the dimension we split on next) 
                 rightTree = sortedPoints;
                 rightTree = rightTree.subList(median+1, sizeOfTree);
-                rightChild = buildTree(rightTree, flip(bXDim), currParent); 
-                     
+                rightChild = new Node(sortedPoints.get(findMedium(rightTree)));
+                rightChild = buildTree(rightTree, flip(bXDim), rightChild); 
+                if (rightChild!= null) {
+                 rightChild.setParent(parent);    
+                }
                 currParent.setLeftChild(leftChild); 
                 currParent.setRightChild(rightChild); 
-         
+            if (currParent.getParent()==null) {
+            System.out.println(currParent.getPoint());
+                
+        }
                 return currParent;
-            }
+            //}
             
         }
          
@@ -333,12 +567,14 @@ public class Node
         private Node leftChild;
         private Node rightChild;
         private Point point;
+        private boolean dimension; 
 
         public Node(Point x){
             this.point = x;
             this.parent = null;
             this.leftChild = null;
             this.rightChild = null;
+            this.dimension = true;
         }
 
         public void setParent(Node parent){
@@ -371,6 +607,14 @@ public class Node
 
         public Node getParent(){
             return parent;
+        }
+
+        public void setDimension(boolean x){
+            this.dimension = x;
+        }
+
+        public boolean getDimension(){
+            return this.dimension;
         }
                
     }
