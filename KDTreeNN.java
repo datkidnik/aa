@@ -513,6 +513,8 @@ public class KDTreeNN implements NearestNeigh{
                 rightChild = new Node(sortedPoints.get(1));
                 currParent.setRightChild(rightChild);
                 currParent.setLeftChild(leftChild);
+                leftChild.setParent(parent); 
+                rightChild.setParent(parent); 
                 return currParent; 
             }
             else{
